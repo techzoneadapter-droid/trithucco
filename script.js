@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_URL = "";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzgyjJt0AzsZKmyNCvKT5ymxohIDbl88eMgOKPUizYB7mz9_giWH4Vsnsi_BubZQKA/exec";
 
 const PROMO_END_TIME = "";
 
