@@ -16,88 +16,116 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="design/thật.png" />
     <link rel="icon" href="design/thật2.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Noto+Serif:wght@500;600;700;800;900&display=swap&subset=vietnamese"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header" aria-label="Đầu trang">
-      <a class="brand" href="#top" aria-label="TRI THỨC CỔ">TRI THỨC CỔ</a>
+      <a class="brand js-buy" href="#order-form" aria-label="TRI THỨC CỔ">TRI THỨC CỔ</a>
       <button class="ghost-buy js-buy" type="button">Đặt sách</button>
     </header>
 
     <main id="top">
       <section class="hero section-band">
+        <img class="hero-bg" src="design/ChatGPT Image 10_12_21 3 thg 9, 2026 (1).png" alt="" aria-hidden="true" />
         <div class="mist mist-a"></div>
         <div class="mist mist-b"></div>
+
         <div class="hero-copy reveal">
           <div class="badge-row" aria-label="Ưu đãi">
             <span>Miễn phí vận chuyển</span>
-            <span>Giảm 20%</span>
+            <span>Giảm 50.000đ</span>
             <span>199.000đ</span>
           </div>
-          <p class="eyebrow">Người xưa không nói thừa</p>
-          <h1>TRI THỨC CỔ</h1>
-          <h2>Có những điều người ta phải đi rất lâu mới hiểu. Người xưa chỉ cần một câu đã nói hết.</h2>
-          <p>
+          <p class="eyebrow">NGƯỜI XƯA KHÔNG NÓI THỪA</p>
+          <h1>Có những điều người ta phải đi rất lâu mới hiểu. Người xưa chỉ cần một câu đã nói hết.</h1>
+          <p class="hero-lead">
             Người xưa không dạy cách làm giàu thật nhanh. Họ dạy cách nhìn người, giữ mình,
             đối nhân xử thế và giữ cơ nghiệp để không phải trả giá chỉ vì một lần nhìn sai.
           </p>
-          <div class="price-line">
-            <span class="old-price">249.000đ</span>
-            <span class="new-price">199.000đ</span>
-            <span class="discount">GIẢM 20%</span>
+          <div class="price-line" aria-label="Giá bán">
+            <span class="old-price" data-original-price>249.000đ</span>
+            <span class="new-price" data-sale-price>199.000đ</span>
+            <span class="discount">GIẢM 50.000đ</span>
           </div>
           <p class="ship">Miễn phí vận chuyển toàn quốc</p>
-          <button class="primary-cta js-buy" type="button">ĐẶT SÁCH NGAY – 199.000đ</button>
+          <button class="primary-cta js-buy" type="button">ĐẶT SÁCH NGAY – <span data-current-price>199.000đ</span></button>
         </div>
+
         <figure class="hero-book reveal">
           <img src="design/thật.png" alt="Sách TRI THỨC CỔ đặt trên bàn gỗ" />
         </figure>
       </section>
 
-      <section class="section intro">
-        <div class="narrow reveal">
-          <p class="eyebrow">Đọc sớm một chút, bớt trả giá một chút</p>
-          <h2>Càng từng trải, càng hiểu lời người xưa chưa bao giờ cũ</h2>
-          <p>
-            Có những bài học làm ăn phải mất tiền mới hiểu. Có những bài học về lòng người
-            phải mất nhiều năm mới ngộ ra.
-          </p>
-          <p>
-            Có những lần dùng nhầm người, tin nhầm người, nóng vội hoặc tham một chút lợi
-            trước mắt... cái giá phải trả lại kéo dài rất lâu.
-          </p>
-          <p>
-            TRI THỨC CỔ gom lại những kinh nghiệm về lòng người, tiền bạc, làm ăn, chữ tín,
-            gia đình, thành bại và cách sống giữa đời.
-          </p>
+      <section class="promo section-band reveal" aria-label="Ưu đãi phát hành">
+        <div>
+          <p class="eyebrow">ƯU ĐÃI PHÁT HÀNH</p>
+          <h2>Giảm 50.000đ + Miễn phí vận chuyển toàn quốc</h2>
+          <p id="promo-count">Ưu đãi giới hạn cho 100 đơn đầu tiên</p>
+        </div>
+        <div class="promo-box">
+          <div class="promo-price"><span data-original-price>249.000đ</span><strong data-sale-price>199.000đ</strong></div>
+          <p>Ưu đãi kết thúc sau</p>
+          <div class="countdown" id="promo-countdown">00 : 00 : 00</div>
+          <p class="promo-status" id="promo-status"></p>
+          <button class="secondary-cta js-buy" type="button">Nhận ưu đãi</button>
         </div>
       </section>
 
+      <section class="section insight">
+        <div class="insight-text reveal">
+          <p class="eyebrow">Đọc sớm một chút. Bớt trả giá một chút.</p>
+          <h2>Có những bài học, học bằng sách chỉ mất vài giờ. Học bằng cuộc đời có khi mất vài năm.</h2>
+          <p>Có những bài học làm ăn phải mất tiền mới hiểu.</p>
+          <p>Có những bài học về lòng người phải mất nhiều năm mới ngộ ra.</p>
+          <p>Người đi trước đã trả giá để hiểu. Người đi sau không nhất thiết phải trả lại đúng cái giá ấy.</p>
+          <strong>Mượn trí người xưa để bớt đi đường vòng.</strong>
+        </div>
+        <figure class="insight-image reveal">
+          <img src="design/thật1.png" alt="Người đọc sách TRI THỨC CỔ" />
+        </figure>
+      </section>
+
       <section class="section topics">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Những điều đáng đọc chậm</p>
+          <h2>TRI THỨC CỔ nói về lòng người, tiền bạc, chữ tín và cách giữ mình giữa đời.</h2>
+        </div>
         <div class="topic-grid">
           <article class="topic-card reveal">
-            <h3>NHÌN NGƯỜI</h3>
-            <p>Hiểu người qua việc họ làm, không chỉ qua điều họ nói.</p>
+            <span class="seal" aria-hidden="true">◇</span>
+            <h3>Nhìn người</h3>
+            <p>Nhìn việc họ làm, không chỉ nghe điều họ nói.</p>
           </article>
           <article class="topic-card reveal">
-            <h3>ĐỐI NHÂN XỬ THẾ</h3>
-            <p>Biết tiến, biết lùi, biết giữ mình giữa lòng người.</p>
+            <span class="seal" aria-hidden="true">◇</span>
+            <h3>Đối nhân xử thế</h3>
+            <p>Biết tiến, biết lùi, biết giữ mình.</p>
           </article>
           <article class="topic-card reveal">
-            <h3>TIỀN BẠC & LỢI ÍCH</h3>
-            <p>Khi đồng tiền bước vào, lòng người cũng dễ đổi khác.</p>
+            <span class="seal" aria-hidden="true">◇</span>
+            <h3>Tiền bạc & lợi ích</h3>
+            <p>Khi lợi ích xuất hiện, lòng người dễ lộ rõ.</p>
           </article>
           <article class="topic-card reveal">
-            <h3>DÙNG NGƯỜI & CHỮ TÍN</h3>
-            <p>Người phù hợp đặt đúng chỗ mới thành người hữu dụng.</p>
+            <span class="seal" aria-hidden="true">◇</span>
+            <h3>Làm ăn & chữ tín</h3>
+            <p>Một lần được lợi chưa chắc bằng một mối quan hệ dài lâu.</p>
           </article>
           <article class="topic-card reveal">
-            <h3>THÀNH BẠI & THỜI THẾ</h3>
-            <p>Có lúc phải tiến. Có lúc biết dừng mới là khôn.</p>
+            <span class="seal" aria-hidden="true">◇</span>
+            <h3>Thành bại & thời thế</h3>
+            <p>Biết thời, biết thế, biết lúc nên tiến.</p>
           </article>
           <article class="topic-card reveal">
-            <h3>TU THÂN</h3>
-            <p>Người thắng được người khác chưa chắc mạnh. Người giữ được mình mới khó.</p>
+            <span class="seal" aria-hidden="true">◇</span>
+            <h3>Tu thân</h3>
+            <p>Thắng người chưa chắc khó bằng thắng chính mình.</p>
           </article>
         </div>
       </section>
@@ -107,10 +135,9 @@
         <div class="wisdom-text reveal">
           <p>Người xưa không sống trong thời đại của chúng ta.</p>
           <h2>Nhưng họ đã nhìn lòng người đủ lâu để thấy những điều hôm nay vẫn đang lặp lại.</h2>
-          <p>
-            Có những câu đọc lúc chưa trải chỉ thấy bình thường. Đến khi đời dạy đủ đau...
-            mới hiểu người xưa nói không thừa.
-          </p>
+          <p>Có những câu đọc lúc chưa trải chỉ thấy bình thường.</p>
+          <strong>Đến khi đời dạy đủ đau... mới hiểu người xưa nói không thừa.</strong>
+          <button class="primary-cta js-buy" type="button">ĐỌC SỚM – BỚT TRẢ GIÁ</button>
         </div>
       </section>
 
@@ -122,10 +149,10 @@
           <p class="eyebrow">SỞ HỮU TRI THỨC CỔ</p>
           <h2>Mượn trí người đi trước để bớt đi đường vòng.</h2>
           <div class="checkout-price">
-            <span>249.000đ</span>
-            <strong>199.000đ</strong>
+            <span data-original-price>249.000đ</span>
+            <strong data-sale-price>199.000đ</strong>
           </div>
-          <p class="saving">Tiết kiệm 50.000đ · Miễn phí vận chuyển toàn quốc</p>
+          <p class="saving">Tiết kiệm 50.000đ · FREESHIP TOÀN QUỐC</p>
 
           <form id="order-form" novalidate>
             <label>
@@ -141,24 +168,23 @@
               <textarea name="address" rows="3" autocomplete="street-address" required></textarea>
             </label>
             <label>
-              Số lượng sách
+              Số lượng
               <input name="quantity" type="number" min="1" step="1" value="1" required />
             </label>
             <div class="total-row">
-              <span>Tổng thanh toán</span>
+              <span>Tổng tiền</span>
               <strong id="total-price">199.000đ</strong>
             </div>
-            <button class="primary-cta submit-btn" type="submit">
-              ĐẶT SÁCH – MIỄN PHÍ VẬN CHUYỂN
-            </button>
+            <button class="primary-cta submit-btn" type="submit">ĐẶT SÁCH – <span data-current-price>199.000đ</span></button>
+            <p class="under-cta">Miễn phí vận chuyển toàn quốc</p>
             <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
           </form>
         </div>
       </section>
     </main>
 
-    <div class="mobile-buy-bar">
-      <span>199.000đ</span>
+    <div class="mobile-buy-bar" id="mobile-buy-bar">
+      <span data-current-price>199.000đ</span>
       <button class="js-buy" type="button">ĐẶT SÁCH NGAY</button>
     </div>
 

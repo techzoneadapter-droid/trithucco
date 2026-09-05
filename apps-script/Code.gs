@@ -12,6 +12,22 @@ const HEADERS = [
   "URL trang",
 ];
 
+function doGet(e) {
+  try {
+    const action = String((e && e.parameter && e.parameter.action) || "");
+    if (action !== "count") {
+      return jsonResponse({ success: false, error: "Action không hợp lệ." });
+    }
+
+    const sheet = getSheet();
+    ensureHeader(sheet);
+    const rowCount = Math.max(0, sheet.getLastRow() - 1);
+    return jsonResponse({ success: true, count: rowCount });
+  } catch (err) {
+    return jsonResponse({ success: false, error: err.message || "Không thể đọc số đơn." });
+  }
+}
+
 function doPost(e) {
   try {
     const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");

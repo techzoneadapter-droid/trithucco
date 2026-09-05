@@ -1,7 +1,29 @@
 const GOOGLE_SCRIPT_URL = "";
-const UNIT_PRICE = 199000;
+
+const PROMO_END_TIME = "";
+
+const PROMO_CONFIG = {
+  originalPrice: 249000,
+  salePrice: 199000,
+  discount: 50000,
+  freeShipping: true,
+  promoLimit: 100,
+  endTime: PROMO_END_TIME,
+  useOriginalPriceAfterPromo: false,
+};
 
 const formatVnd = (value) => `${Number(value).toLocaleString("vi-VN")}đ`;
+
+const hasPromoEnded = () => {
+  if (!PROMO_CONFIG.endTime) return false;
+  return Date.now() > new Date(PROMO_CONFIG.endTime).getTime();
+};
+
+const activePrice = () => {
+  return hasPromoEnded() && PROMO_CONFIG.useOriginalPriceAfterPromo
+    ? PROMO_CONFIG.originalPrice
+    : PROMO_CONFIG.salePrice;
+};
 
 const trackEvent = (eventName, payload = {}) => {
   window.dataLayer = window.dataLayer || [];
@@ -16,22 +38,46 @@ const trackEvent = (eventName, payload = {}) => {
   }
 };
 
-const orderSection = document.querySelector("#order");
 const orderForm = document.querySelector("#order-form");
+const orderPanel = document.querySelector(".order-panel");
 const quantityInput = orderForm.querySelector('[name="quantity"]');
 const totalPrice = document.querySelector("#total-price");
 const message = document.querySelector("#form-message");
 const submitButton = orderForm.querySelector('button[type="submit"]');
+const promoCount = document.querySelector("#promo-count");
+const promoCountdown = document.querySelector("#promo-countdown");
+const promoStatus = document.querySelector("#promo-status");
 
 const updateTotal = () => {
   const quantity = Math.max(1, parseInt(quantityInput.value, 10) || 1);
   quantityInput.value = quantity;
-  totalPrice.textContent = formatVnd(UNIT_PRICE * quantity);
+  totalPrice.textContent = formatVnd(activePrice() * quantity);
 };
 
-const scrollToOrder = () => {
-  trackEvent("InitiateCheckout", { currency: "VND", value: UNIT_PRICE });
-  orderSection.scrollIntoView({ behavior: "smooth", block: "start" });
+const updatePriceText = () => {
+  const price = activePrice();
+  document.querySelectorAll("[data-original-price]").forEach((el) => {
+    el.textContent = formatVnd(PROMO_CONFIG.originalPrice);
+  });
+  document.querySelectorAll("[data-sale-price]").forEach((el) => {
+    el.textContent = formatVnd(price);
+  });
+  document.querySelectorAll("[data-current-price]").forEach((el) => {
+    el.textContent = formatVnd(price);
+  });
+  updateTotal();
+};
+
+const highlightOrderForm = () => {
+  orderPanel.classList.add("form-highlight");
+  window.setTimeout(() => orderPanel.classList.remove("form-highlight"), 1100);
+};
+
+const scrollToOrder = (event) => {
+  if (event) event.preventDefault();
+  trackEvent("InitiateCheckout", { currency: "VND", value: activePrice() });
+  document.querySelector("#order-form").scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(highlightOrderForm, 450);
 };
 
 const setMessage = (text, type = "") => {
@@ -40,6 +86,51 @@ const setMessage = (text, type = "") => {
 };
 
 const isVietnamesePhone = (phone) => /^(0|\+84)(3|5|7|8|9)\d{8}$/.test(phone.replace(/\s/g, ""));
+
+const loadOrderCount = async () => {
+  if (!GOOGLE_SCRIPT_URL) {
+    promoCount.textContent = `Ưu đãi giới hạn cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
+    return;
+  }
+
+  try {
+    const url = new URL(GOOGLE_SCRIPT_URL);
+    url.searchParams.set("action", "count");
+    const response = await fetch(url.toString(), { method: "GET" });
+    const result = await response.json();
+    if (!response.ok || !result.success || typeof result.count !== "number") {
+      throw new Error("Không đọc được số đơn thật.");
+    }
+    const registered = Math.max(0, result.count);
+    const remaining = Math.max(0, PROMO_CONFIG.promoLimit - registered);
+    promoCount.textContent = `Đã có ${registered} đơn đăng ký – còn ${remaining} suất ưu đãi`;
+  } catch {
+    promoCount.textContent = `Ưu đãi giới hạn cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
+  }
+};
+
+const updateCountdown = () => {
+  if (!PROMO_CONFIG.endTime) {
+    promoCountdown.textContent = "00 : 00 : 00";
+    promoStatus.textContent = "";
+    return;
+  }
+
+  const diff = new Date(PROMO_CONFIG.endTime).getTime() - Date.now();
+  if (diff <= 0) {
+    promoCountdown.textContent = "00 : 00 : 00";
+    promoStatus.textContent = "Chương trình ưu đãi đã kết thúc";
+    updatePriceText();
+    return;
+  }
+
+  const hours = Math.floor(diff / 1000 / 60 / 60);
+  const minutes = Math.floor((diff / 1000 / 60) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+  promoCountdown.textContent = [hours, minutes, seconds]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(" : ");
+};
 
 document.querySelectorAll(".js-buy").forEach((button) => {
   button.addEventListener("click", scrollToOrder);
@@ -56,7 +147,8 @@ orderForm.addEventListener("submit", async (event) => {
   const phone = String(formData.get("phone") || "").trim();
   const address = String(formData.get("address") || "").trim();
   const quantity = Math.max(1, parseInt(formData.get("quantity"), 10) || 1);
-  const total = UNIT_PRICE * quantity;
+  const unitPrice = activePrice();
+  const total = unitPrice * quantity;
 
   if (!name || !phone || !address) {
     setMessage("Vui lòng điền đủ họ tên, số điện thoại và địa chỉ nhận hàng.", "error");
@@ -74,6 +166,7 @@ orderForm.addEventListener("submit", async (event) => {
   }
 
   submitButton.disabled = true;
+  const originalSubmitHtml = submitButton.innerHTML;
   submitButton.textContent = "ĐANG GỬI ĐƠN...";
   setMessage("Đang lưu đơn hàng...", "");
 
@@ -86,7 +179,7 @@ orderForm.addEventListener("submit", async (event) => {
         phone,
         address,
         quantity,
-        unitPrice: UNIT_PRICE,
+        unitPrice,
         total,
         source: "Landing page TRI THỨC CỔ",
         pageUrl: window.location.href,
@@ -103,27 +196,41 @@ orderForm.addEventListener("submit", async (event) => {
     orderForm.reset();
     quantityInput.value = "1";
     updateTotal();
+    loadOrderCount();
     setMessage("Đặt sách thành công! Chúng tôi sẽ liên hệ xác nhận đơn hàng với bạn sớm nhất.", "success");
   } catch (error) {
     setMessage(error.message || "Không thể gửi đơn. Vui lòng thử lại sau.", "error");
   } finally {
     submitButton.disabled = false;
-    submitButton.textContent = "ĐẶT SÁCH – MIỄN PHÍ VẬN CHUYỂN";
+    submitButton.innerHTML = originalSubmitHtml;
+    updatePriceText();
   }
 });
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.16 }
-);
+const revealObserver = "IntersectionObserver" in window
+  ? new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.16 }
+    )
+  : null;
 
-document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
-trackEvent("ViewContent", { content_name: "TRI THỨC CỔ", currency: "VND", value: UNIT_PRICE });
-updateTotal();
+document.querySelectorAll(".reveal").forEach((element) => {
+  if (revealObserver) {
+    revealObserver.observe(element);
+  } else {
+    element.classList.add("visible");
+  }
+});
+
+trackEvent("ViewContent", { content_name: "TRI THỨC CỔ", currency: "VND", value: activePrice() });
+updatePriceText();
+loadOrderCount();
+updateCountdown();
+window.setInterval(updateCountdown, 1000);
