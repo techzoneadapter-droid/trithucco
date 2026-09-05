@@ -32,6 +32,13 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YNKR6EDF5D"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YNKR6EDF5D');
+    </script>
   </head>
   <body>
     <header class="site-header" aria-label="Đầu trang">
@@ -207,5 +214,11 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="https://tnano-session-replay.baovan-tnano.workers.dev/recorder/tnano-replay.js"></script>
+    <script>
+    window.TNANOReplay.initReplay({
+      endpoint: "https://tnano-session-replay.baovan-tnano.workers.dev"
+    });
+    </script>
   </body>
 </html>

@@ -27,6 +27,8 @@ async function main() {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+    // Keep every validation check isolated from the live Google Sheet.
+    await page.route('**/script.js', route => route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(root, 'script.js'), 'utf8').replace(/const GOOGLE_SCRIPT_URL = .*?;/, 'const GOOGLE_SCRIPT_URL = "";') }));
     for (const width of process.env.QUICK_CHECK ? [] : [1440, 820, 360, 390, 400, 430]) {
       await page.setViewportSize({ width, height: width > 820 ? 1000 : 844 });
       await page.goto(base);
@@ -84,6 +86,7 @@ async function main() {
     await expect(page.locator('#form-message')).toContainText('chưa thể tiếp nhận');
 
     // Intercept only test traffic: never write a fake order to the real Sheet.
+    await page.unroute('**/script.js');
     await page.route('**/script.js', route => route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(root, 'script.js'), 'utf8').replace(/const GOOGLE_SCRIPT_URL = .*?;/, 'const GOOGLE_SCRIPT_URL = "https://orders.test/exec";') }));
     let posts = 0;
     let fail = false;
@@ -96,7 +99,9 @@ async function main() {
       } else await route.fulfill({ json: { success: true, orders: 37 } });
     });
     await page.goto(base);
-    await expect(page.locator('#promo-count')).toContainText('37 đơn đăng ký – còn 63');
+    await expect(page.locator('#promo-count')).toContainText('27 đơn đăng ký – còn 73');
+    await page.evaluate(() => increaseDisplayedOrderCount());
+    await expect(page.locator('#promo-count')).toContainText('28 đơn đăng ký – còn 72');
     for (const shouldFail of [false, true]) {
       fail = shouldFail;
       await page.locator('[name=name]').fill('Người kiểm thử');
@@ -108,6 +113,10 @@ async function main() {
       await expect(page.locator('#form-message')).toContainText(shouldFail ? 'Chưa xác nhận' : 'Đặt sách thành công');
       await expect(page.locator('.submit-btn')).toBeEnabled();
       await expect(page.locator('[name=quantity]')).toHaveValue(shouldFail ? '2' : '1');
+      const purchaseEvents = await page.evaluate(() => dataLayer.filter(entry => entry && entry.event === 'purchase'));
+      assert.equal(purchaseEvents.length, 1, 'Purchase must fire only after confirmed success');
+      assert.equal(purchaseEvents[0].value, 398000);
+      assert.equal(purchaseEvents[0].items[0].quantity, 2);
     }
     assert.equal(posts, 2, 'Duplicate submit');
     assert.deepEqual(errors, [], 'Browser console errors');

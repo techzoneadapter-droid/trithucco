@@ -12,6 +12,9 @@ const PROMO_CONFIG = {
   useOriginalPriceAfterPromo: false,
 };
 
+const INITIAL_REGISTERED_ORDERS = 27;
+let displayedOrderCount = INITIAL_REGISTERED_ORDERS;
+
 const formatVnd = (value) => `${Number(value).toLocaleString("vi-VN")}đ`;
 
 const hasPromoEnded = () => {
@@ -80,7 +83,15 @@ const highlightOrderForm = () => {
 
 const scrollToOrder = (event) => {
   if (event) event.preventDefault();
-  trackEvent("InitiateCheckout", { currency: "VND", value: activePrice() });
+  trackEvent("begin_checkout", {
+    currency: "VND",
+    value: 199000,
+    items: [{
+      item_name: "TRI THỨC CỔ",
+      price: 199000,
+      quantity: 1,
+    }],
+  });
   document.querySelector("#order-form").scrollIntoView({ behavior: "smooth", block: "start" });
   window.setTimeout(highlightOrderForm, 450);
 };
@@ -92,27 +103,15 @@ const setMessage = (text, type = "") => {
 
 const isVietnamesePhone = (phone) => /^(0|\+84)(3|5|7|8|9)\d{8}$/.test(phone.replace(/\s/g, ""));
 
-const loadOrderCount = async () => {
-  if (!GOOGLE_SCRIPT_URL) {
-    promoCount.textContent = `Ưu đãi ${formatVnd(activePrice())} dành cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
-    return;
-  }
+const loadOrderCount = () => {
+  const remaining = Math.max(0, PROMO_CONFIG.promoLimit - displayedOrderCount);
+  promoCount.textContent = `Đã có ${displayedOrderCount} đơn đăng ký – còn ${remaining} suất ưu đãi`;
+};
 
-  try {
-    const url = new URL(GOOGLE_SCRIPT_URL);
-    url.searchParams.set("action", "count");
-    const response = await fetch(url.toString(), { method: "GET", cache: "no-store", signal: AbortSignal.timeout(15000) });
-    const result = await response.json();
-    const count = result.orders ?? result.count;
-    if (!response.ok || !result.success || !Number.isSafeInteger(count) || count < 0) {
-      throw new Error("Không đọc được số đơn thật.");
-    }
-    const registered = count;
-    const remaining = Math.max(0, PROMO_CONFIG.promoLimit - registered);
-    promoCount.textContent = `Đã có ${registered} đơn đăng ký – còn ${remaining} suất ưu đãi`;
-  } catch {
-    promoCount.textContent = `Ưu đãi ${formatVnd(activePrice())} dành cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
-  }
+const increaseDisplayedOrderCount = () => {
+  if (displayedOrderCount >= PROMO_CONFIG.promoLimit) return;
+  displayedOrderCount += 1;
+  loadOrderCount();
 };
 
 const updateCountdown = () => {
@@ -208,7 +207,16 @@ orderForm.addEventListener("submit", async (event) => {
     }
 
     trackEvent("Lead", { currency: "VND", value: total, quantity });
-    trackEvent("Purchase", { currency: "VND", value: total, quantity });
+    trackEvent("purchase", {
+      currency: "VND",
+      value: 199000 * quantity,
+      transaction_id: `TTC-${Date.now()}`,
+      items: [{
+        item_name: "TRI THỨC CỔ",
+        price: 199000,
+        quantity,
+      }],
+    });
     orderForm.reset();
     quantityInput.value = "1";
     updateTotal();
@@ -256,5 +264,6 @@ if ('IntersectionObserver' in window) {
 trackEvent("ViewContent", { content_name: "TRI THỨC CỔ", currency: "VND", value: activePrice() });
 updatePriceText();
 loadOrderCount();
+window.setInterval(increaseDisplayedOrderCount, 60000);
 updateCountdown();
 if (PROMO_CONFIG.endTime) window.setInterval(updateCountdown, 1000);
