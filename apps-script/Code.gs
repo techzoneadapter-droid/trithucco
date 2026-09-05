@@ -15,26 +15,32 @@ const HEADERS = [
 function doGet(e) {
   try {
     const action = String((e && e.parameter && e.parameter.action) || "");
-    if (action !== "count") {
+    if (action && action !== "count") {
       return jsonResponse({ success: false, error: "Action không hợp lệ." });
     }
 
     const sheet = getSheet();
-    ensureHeader(sheet);
-    const rowCount = Math.max(0, sheet.getLastRow() - 1);
-    return jsonResponse({ success: true, count: rowCount });
+    const rowCount = sheet.getDataRange().getValues().slice(1).filter((row) =>
+      String(row[1] || "").trim() && String(row[2] || "").trim() &&
+      String(row[3] || "").trim() && Number(row[4]) > 0
+    ).length;
+    return jsonResponse({ success: true, orders: rowCount, count: rowCount });
   } catch (err) {
     return jsonResponse({ success: false, error: err.message || "Không thể đọc số đơn." });
   }
 }
 
 function doPost(e) {
+  let lock;
   try {
     const payload = JSON.parse((e && e.postData && e.postData.contents) || "{}");
     const name = String(payload.name || "").trim();
     const phone = String(payload.phone || "").trim();
     const address = String(payload.address || "").trim();
-    const quantity = Math.max(1, parseInt(payload.quantity, 10) || 1);
+    const quantity = Number(payload.quantity);
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+      return jsonResponse({ success: false, error: "Số lượng không hợp lệ." });
+    }
     const unitPrice = 199000;
     const total = unitPrice * quantity;
 
@@ -46,24 +52,33 @@ function doPost(e) {
       return jsonResponse({ success: false, error: "Số điện thoại không hợp lệ." });
     }
 
+    lock = LockService.getScriptLock();
+    lock.waitLock(15000);
     const sheet = getSheet();
     ensureHeader(sheet);
     sheet.appendRow([
       new Date(),
-      name,
-      phone,
-      address,
+      safeCell(name),
+      safeCell(phone),
+      safeCell(address),
       quantity,
       unitPrice,
       total,
-      payload.source || "Landing page",
-      payload.pageUrl || "",
+      safeCell(payload.source || "Landing page"),
+      safeCell(payload.pageUrl || ""),
     ]);
 
     return jsonResponse({ success: true });
   } catch (err) {
     return jsonResponse({ success: false, error: err.message || "Không thể lưu đơn hàng." });
+  } finally {
+    if (lock && lock.hasLock()) lock.releaseLock();
   }
+}
+
+function safeCell(value) {
+  const text = String(value);
+  return /^[=+@-]/.test(text) ? "'" + text : text;
 }
 
 function getSheet() {

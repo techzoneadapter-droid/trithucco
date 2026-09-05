@@ -49,9 +49,14 @@ const promoCountdown = document.querySelector("#promo-countdown");
 const promoStatus = document.querySelector("#promo-status");
 
 const updateTotal = () => {
-  const quantity = Math.max(1, parseInt(quantityInput.value, 10) || 1);
-  quantityInput.value = quantity;
+  const quantity = Number(quantityInput.value);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+    totalPrice.textContent = "Chọn từ 1–100 cuốn";
+    return;
+  }
   totalPrice.textContent = formatVnd(activePrice() * quantity);
+  const submitPrice = submitButton.querySelector('[data-current-price]');
+  if (submitPrice) submitPrice.textContent = formatVnd(activePrice() * quantity);
 };
 
 const updatePriceText = () => {
@@ -70,7 +75,7 @@ const updatePriceText = () => {
 
 const highlightOrderForm = () => {
   orderPanel.classList.add("form-highlight");
-  window.setTimeout(() => orderPanel.classList.remove("form-highlight"), 1100);
+  window.setTimeout(() => orderPanel.classList.remove("form-highlight"), 950);
 };
 
 const scrollToOrder = (event) => {
@@ -89,29 +94,31 @@ const isVietnamesePhone = (phone) => /^(0|\+84)(3|5|7|8|9)\d{8}$/.test(phone.rep
 
 const loadOrderCount = async () => {
   if (!GOOGLE_SCRIPT_URL) {
-    promoCount.textContent = `Ưu đãi giới hạn cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
+    promoCount.textContent = `Ưu đãi ${formatVnd(activePrice())} dành cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
     return;
   }
 
   try {
     const url = new URL(GOOGLE_SCRIPT_URL);
     url.searchParams.set("action", "count");
-    const response = await fetch(url.toString(), { method: "GET" });
+    const response = await fetch(url.toString(), { method: "GET", cache: "no-store", signal: AbortSignal.timeout(15000) });
     const result = await response.json();
-    if (!response.ok || !result.success || typeof result.count !== "number") {
+    const count = result.orders ?? result.count;
+    if (!response.ok || !result.success || !Number.isSafeInteger(count) || count < 0) {
       throw new Error("Không đọc được số đơn thật.");
     }
-    const registered = Math.max(0, result.count);
+    const registered = count;
     const remaining = Math.max(0, PROMO_CONFIG.promoLimit - registered);
     promoCount.textContent = `Đã có ${registered} đơn đăng ký – còn ${remaining} suất ưu đãi`;
   } catch {
-    promoCount.textContent = `Ưu đãi giới hạn cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
+    promoCount.textContent = `Ưu đãi ${formatVnd(activePrice())} dành cho ${PROMO_CONFIG.promoLimit} đơn đầu tiên`;
   }
 };
 
 const updateCountdown = () => {
-  if (!PROMO_CONFIG.endTime) {
-    promoCountdown.textContent = "00 : 00 : 00";
+  const hasDeadline = Boolean(PROMO_CONFIG.endTime) && Number.isFinite(Date.parse(PROMO_CONFIG.endTime));
+  document.querySelector('#promo-timer').hidden = !hasDeadline;
+  if (!hasDeadline) {
     promoStatus.textContent = "";
     return;
   }
@@ -140,28 +147,36 @@ quantityInput.addEventListener("input", updateTotal);
 
 orderForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (submitButton.disabled) return;
   setMessage("");
 
   const formData = new FormData(orderForm);
   const name = String(formData.get("name") || "").trim();
   const phone = String(formData.get("phone") || "").trim();
   const address = String(formData.get("address") || "").trim();
-  const quantity = Math.max(1, parseInt(formData.get("quantity"), 10) || 1);
+  const quantity = Number(formData.get("quantity"));
   const unitPrice = activePrice();
   const total = unitPrice * quantity;
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+    setMessage("Vui lòng chọn số lượng nguyên từ 1 đến 100 cuốn.", "error");
+    quantityInput.focus();
+    return;
+  }
 
   if (!name || !phone || !address) {
     setMessage("Vui lòng điền đủ họ tên, số điện thoại và địa chỉ nhận hàng.", "error");
+    orderForm.querySelector(`[name="${!name ? 'name' : !phone ? 'phone' : 'address'}"]`).focus();
     return;
   }
 
   if (!isVietnamesePhone(phone)) {
     setMessage("Số điện thoại Việt Nam chưa đúng. Vui lòng kiểm tra lại.", "error");
+    orderForm.querySelector('[name="phone"]').focus();
     return;
   }
 
   if (!GOOGLE_SCRIPT_URL) {
-    setMessage("Chưa có Google Apps Script Web App URL. Vui lòng cấu hình GOOGLE_SCRIPT_URL trong script.js.", "error");
+    setMessage("Hiện chưa thể tiếp nhận đơn trực tuyến. Bạn vui lòng quay lại sau.", "error");
     return;
   }
 
@@ -173,6 +188,7 @@ orderForm.addEventListener("submit", async (event) => {
   try {
     const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
+      signal: AbortSignal.timeout(30000),
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
         name,
@@ -199,7 +215,7 @@ orderForm.addEventListener("submit", async (event) => {
     loadOrderCount();
     setMessage("Đặt sách thành công! Chúng tôi sẽ liên hệ xác nhận đơn hàng với bạn sớm nhất.", "success");
   } catch (error) {
-    setMessage(error.message || "Không thể gửi đơn. Vui lòng thử lại sau.", "error");
+    setMessage("Chưa xác nhận được đơn hàng. Vui lòng kiểm tra kết nối và thử lại sau.", "error");
   } finally {
     submitButton.disabled = false;
     submitButton.innerHTML = originalSubmitHtml;
@@ -223,14 +239,22 @@ const revealObserver = "IntersectionObserver" in window
 
 document.querySelectorAll(".reveal").forEach((element) => {
   if (revealObserver) {
+    element.classList.add('reveal-ready');
     revealObserver.observe(element);
   } else {
     element.classList.add("visible");
   }
 });
 
+// Hide the mobile bar while any part of checkout is visible, including submit.
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(([entry]) => {
+    document.querySelector('#mobile-buy-bar').classList.toggle('is-hidden', entry.isIntersecting);
+  }, { threshold: 0 }).observe(orderPanel);
+}
+
 trackEvent("ViewContent", { content_name: "TRI THỨC CỔ", currency: "VND", value: activePrice() });
 updatePriceText();
 loadOrderCount();
 updateCountdown();
-window.setInterval(updateCountdown, 1000);
+if (PROMO_CONFIG.endTime) window.setInterval(updateCountdown, 1000);

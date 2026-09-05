@@ -5,7 +5,11 @@
   "description": "Landing page ban sach TRI THUC CO",
   "scripts": {
     "build": "node scripts/build.js",
+    "test": "node scripts/verify.js",
     "start": "npx serve ."
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "sharp": "^0.35.4"
+  }
 }

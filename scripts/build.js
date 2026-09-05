@@ -63,6 +63,21 @@ for (const [file, content] of sourceFiles) {
   }
 }
 
+// Validate every text source, including strict UTF-8 decoding and composed accents.
+function checkUnicode(directory) {
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (["node_modules", ".git", "test-results", "playwright-report"].includes(entry.name)) continue;
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) { checkUnicode(file); continue; }
+    if (!/\.(html|css|js|gs|md|json)$/.test(file)) continue;
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(fs.readFileSync(file));
+    if (/[\uFFFD\u25A1\u200B-\u200F\uFEFF]/.test(text) || mojibakePattern.test(text) || text !== text.normalize("NFC")) {
+      mojibakeHits.push(path.relative(root, file));
+    }
+  }
+}
+checkUnicode(root);
+
 if (mojibakeHits.length) {
   console.error("Mojibake markers found:");
   for (const hit of mojibakeHits) console.error(`- ${hit}`);

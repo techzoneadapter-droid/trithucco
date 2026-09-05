@@ -20,7 +20,6 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
 }
 
 body {
@@ -32,7 +31,6 @@ body {
   background-size: 34px 34px, auto;
   font-family: var(--body-font);
   line-height: 1.65;
-  overflow-x: hidden;
   text-rendering: geometricPrecision;
 }
 
@@ -72,7 +70,7 @@ h2,
 h3 {
   margin: 0;
   font-family: var(--heading-font);
-  line-height: 1.16;
+  line-height: 1.32;
   letter-spacing: 0;
 }
 
@@ -200,14 +198,19 @@ p {
 
 .hero h1 {
   max-width: 820px;
-  font-size: clamp(40px, 5.8vw, 78px);
+  font-size: clamp(34px, 3.5vw, 52px);
 }
+
+.hero h1 em { color: var(--wood); font-style: normal; }
+.hero-book figcaption { margin-top: 12px; text-align: center; color: var(--muted); font-size: 13px; }
+.primary-cta { gap: 0.3em; }
+:focus-visible { outline: 2px solid var(--wood); outline-offset: 4px; }
 
 .hero-lead {
   max-width: 650px;
   margin-top: 18px;
   color: var(--ink-soft);
-  font-size: clamp(17px, 1.6vw, 21px);
+  font-size: clamp(16px, 1.3vw, 18px);
 }
 
 .price-line {
@@ -275,6 +278,7 @@ p {
 
 .hero-book img,
 .order-media img {
+  height: auto;
   aspect-ratio: 4 / 5;
   object-fit: cover;
 }
@@ -380,7 +384,7 @@ p {
 .section-heading h2,
 .wisdom h2,
 .order h2 {
-  font-size: clamp(30px, 4.4vw, 56px);
+  font-size: clamp(28px, 3.2vw, 44px);
 }
 
 .insight-text {
@@ -408,6 +412,7 @@ p {
 }
 
 .insight-image img {
+  height: auto;
   aspect-ratio: 4 / 5;
   object-fit: cover;
 }
@@ -530,6 +535,8 @@ p {
 .order-media img {
   object-fit: cover;
 }
+
+.order-media { width: 100%; }
 
 .order-panel {
   position: relative;
@@ -672,7 +679,7 @@ textarea:focus {
   font-weight: 900;
 }
 
-.reveal {
+.reveal-ready {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 0.7s ease, transform 0.7s ease;
@@ -682,6 +689,15 @@ textarea:focus {
   opacity: 1;
   transform: translateY(0);
 }
+
+.mobile-buy-bar.is-hidden { transform: translateY(110%); visibility: hidden; }
+.site-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 28px clamp(18px, 5vw, 72px); border-top: 1px solid var(--line); }
+.site-footer > span { font-family: var(--heading-font); font-weight: 800; }
+.site-footer p { color: var(--muted); font-size: 13px; }
+.lifestyle { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1160px; margin: 0 auto; padding-top: 0; }
+.lifestyle figure { margin: 0; }
+.lifestyle img { width: 100%; height: 360px; object-fit: cover; object-position: center; box-shadow: var(--shadow); }
+.lifestyle figcaption { margin-top: 12px; color: var(--wood); font-family: var(--heading-font); font-size: 18px; }
 
 @keyframes drift {
   from {
@@ -744,8 +760,21 @@ textarea:focus {
   }
 
   .hero h1 {
-    font-size: clamp(38px, 10vw, 50px);
+    font-size: clamp(28px, 4.6vw, 38px);
   }
+
+  .hero-copy { display: contents; }
+  .hero .eyebrow { grid-row: 1; margin: 0; }
+  .hero h1 { grid-row: 2; }
+  .hero-book { grid-row: 3; }
+  .hero-offer { grid-row: 4; }
+  .hero-lead { grid-row: 5; }
+  .hero-book img { height: 250px; width: auto; aspect-ratio: auto; }
+  .hero-book figcaption { display: none; }
+  .hero-offer { width: 100%; max-width: 480px; margin: 0 auto; }
+  .hero-offer .price-line { justify-content: center; margin-top: 0; }
+  .hero-offer .ship { text-align: center; font-size: 13px; }
+  .hero-offer .primary-cta { width: 100%; margin-top: 10px; }
 
   .hero-lead {
     margin-top: 12px;
@@ -820,8 +849,17 @@ textarea:focus {
   }
 
   .hero h1 {
-    font-size: clamp(38px, 11.5vw, 48px);
+    font-size: clamp(26px, 6.8vw, 29px);
   }
+
+  .hero { gap: 12px; }
+  .hero .eyebrow { font-size: 11px; }
+  .hero-book img { height: 210px; }
+  .hero-lead { font-size: 14px; }
+  .hero .new-price { font-size: 34px; }
+  .hero .old-price { font-size: 18px; }
+  .hero .discount { font-size: 10px; padding: 4px 6px; }
+  .hero .price-line { gap: 8px; }
 
   .hero-book {
     max-width: 285px;
@@ -862,13 +900,24 @@ textarea:focus {
   }
 
   .topic-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
   .topic-card {
     min-height: 132px;
-    padding: 22px;
+    padding: 18px 14px;
   }
+  .topic-card h3 { font-size: 17px; }
+  .topic-card p { font-size: 13px; }
+  .topic-card .seal { margin-bottom: 8px; }
+  .lifestyle { gap: 12px; padding-top: 0; }
+  .lifestyle img { height: 230px; }
+  .lifestyle figcaption { font-size: 14px; }
+  .site-footer { flex-wrap: wrap; gap: 12px; }
+  .site-footer p { width: 100%; order: 3; }
+  input, textarea { min-width: 0; font-size: 16px; }
+  .total-row { flex-wrap: wrap; }
 
   .wisdom-text p {
     font-size: 16px;

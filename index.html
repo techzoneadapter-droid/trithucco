@@ -14,7 +14,10 @@
       content="Một cuốn sách cũ chứa những điều càng sống lâu càng thấy đúng."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="design/thật.png" />
+    <meta property="og:image" content="https://techzoneadapter-droid.github.io/trithucco/design/th%E1%BA%ADt.png" />
+    <meta property="og:url" content="https://techzoneadapter-droid.github.io/trithucco/" />
+    <meta property="og:locale" content="vi_VN" />
+    <link rel="canonical" href="https://techzoneadapter-droid.github.io/trithucco/" />
     <link rel="icon" href="design/thật2.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,28 +40,25 @@
         <div class="mist mist-b"></div>
 
         <div class="hero-copy reveal">
-          <div class="badge-row" aria-label="Ưu đãi">
-            <span>Miễn phí vận chuyển</span>
-            <span>Giảm 50.000đ</span>
-            <span>199.000đ</span>
-          </div>
           <p class="eyebrow">NGƯỜI XƯA KHÔNG NÓI THỪA</p>
-          <h1>Có những điều người ta phải đi rất lâu mới hiểu. Người xưa chỉ cần một câu đã nói hết.</h1>
+          <h1>Có những điều người ta phải đi rất lâu mới hiểu. <em>Người xưa chỉ cần một câu đã nói hết.</em></h1>
           <p class="hero-lead">
             Người xưa không dạy cách làm giàu thật nhanh. Họ dạy cách nhìn người, giữ mình,
             đối nhân xử thế và giữ cơ nghiệp để không phải trả giá chỉ vì một lần nhìn sai.
           </p>
-          <div class="price-line" aria-label="Giá bán">
+          <div class="hero-offer"><div class="price-line" aria-label="Giá bán">
             <span class="old-price" data-original-price>249.000đ</span>
             <span class="new-price" data-sale-price>199.000đ</span>
             <span class="discount">GIẢM 50.000đ</span>
           </div>
           <p class="ship">Miễn phí vận chuyển toàn quốc</p>
           <button class="primary-cta js-buy" type="button">ĐẶT SÁCH NGAY – <span data-current-price>199.000đ</span></button>
+          </div>
         </div>
 
         <figure class="hero-book reveal">
-          <img src="design/thật.png" alt="Sách TRI THỨC CỔ đặt trên bàn gỗ" />
+          <img src="design/thật.png" alt="Sách TRI THỨC CỔ đặt trên bàn gỗ" fetchpriority="high" width="1122" height="1402" />
+          <figcaption>Một cuốn sách. Nhiều điều để ngẫm.</figcaption>
         </figure>
       </section>
 
@@ -66,13 +66,14 @@
         <div>
           <p class="eyebrow">ƯU ĐÃI PHÁT HÀNH</p>
           <h2>Giảm 50.000đ + Miễn phí vận chuyển toàn quốc</h2>
-          <p id="promo-count">Ưu đãi giới hạn cho 100 đơn đầu tiên</p>
+          <p id="promo-count">Ưu đãi 199.000đ dành cho 100 đơn đầu tiên</p>
         </div>
         <div class="promo-box">
           <div class="promo-price"><span data-original-price>249.000đ</span><strong data-sale-price>199.000đ</strong></div>
-          <p>Ưu đãi kết thúc sau</p>
+          <div id="promo-timer" hidden><p>Ưu đãi kết thúc sau</p>
           <div class="countdown" id="promo-countdown">00 : 00 : 00</div>
           <p class="promo-status" id="promo-status"></p>
+          </div>
           <button class="secondary-cta js-buy" type="button">Nhận ưu đãi</button>
         </div>
       </section>
@@ -80,21 +81,20 @@
       <section class="section insight">
         <div class="insight-text reveal">
           <p class="eyebrow">Đọc sớm một chút. Bớt trả giá một chút.</p>
-          <h2>Có những bài học, học bằng sách chỉ mất vài giờ. Học bằng cuộc đời có khi mất vài năm.</h2>
+          <h2>Mượn trí người xưa để bớt đi đường vòng.</h2>
           <p>Có những bài học làm ăn phải mất tiền mới hiểu.</p>
           <p>Có những bài học về lòng người phải mất nhiều năm mới ngộ ra.</p>
           <p>Người đi trước đã trả giá để hiểu. Người đi sau không nhất thiết phải trả lại đúng cái giá ấy.</p>
-          <strong>Mượn trí người xưa để bớt đi đường vòng.</strong>
         </div>
         <figure class="insight-image reveal">
-          <img src="design/thật1.png" alt="Người đọc sách TRI THỨC CỔ" />
+          <img src="design/thật1.png" alt="Người đọc sách TRI THỨC CỔ trong quán cà phê" width="1122" height="1402" loading="lazy" decoding="async" />
         </figure>
       </section>
 
       <section class="section topics">
         <div class="section-heading reveal">
           <p class="eyebrow">Những điều đáng đọc chậm</p>
-          <h2>TRI THỨC CỔ nói về lòng người, tiền bạc, chữ tín và cách giữ mình giữa đời.</h2>
+          <h2>Hiểu lòng người. Biết giữ mình.</h2>
         </div>
         <div class="topic-grid">
           <article class="topic-card reveal">
@@ -130,6 +130,17 @@
         </div>
       </section>
 
+      <section class="lifestyle section" aria-label="Một khoảng lặng cùng sách">
+        <figure>
+          <img src="design/thật2.png" alt="Cầm đọc TRI THỨC CỔ bên tách cà phê" width="1122" height="1402" loading="lazy" decoding="async" />
+          <figcaption>Một trang sách. Một khoảng lặng.</figcaption>
+        </figure>
+        <figure>
+          <img src="design/thật4.png" alt="TRI THỨC CỔ bên bàn gỗ và chén trà" width="1122" height="1402" loading="lazy" decoding="async" />
+          <figcaption>Đọc chậm, để hiểu sâu hơn.</figcaption>
+        </figure>
+      </section>
+
       <section class="wisdom">
         <img src="design/ChatGPT Image 10_12_24 3 thg 9, 2026 (7).png" alt="" aria-hidden="true" />
         <div class="wisdom-text reveal">
@@ -143,7 +154,7 @@
 
       <section class="order section" id="order">
         <div class="order-media reveal">
-          <img src="design/thật2.png" alt="Cận cảnh bìa sách TRI THỨC CỔ" />
+          <img src="design/thật2.png" alt="Cận cảnh bìa sách TRI THỨC CỔ" width="1122" height="1402" loading="lazy" decoding="async" />
         </div>
         <div class="order-panel reveal">
           <p class="eyebrow">SỞ HỮU TRI THỨC CỔ</p>
@@ -152,7 +163,7 @@
             <span data-original-price>249.000đ</span>
             <strong data-sale-price>199.000đ</strong>
           </div>
-          <p class="saving">Tiết kiệm 50.000đ · FREESHIP TOÀN QUỐC</p>
+          <p class="saving">Tiết kiệm 50.000đ · Miễn phí vận chuyển toàn quốc</p>
 
           <form id="order-form" novalidate>
             <label>
@@ -161,7 +172,7 @@
             </label>
             <label>
               Số điện thoại
-              <input name="phone" inputmode="tel" autocomplete="tel" required />
+              <input name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
             </label>
             <label>
               Địa chỉ nhận hàng
@@ -169,7 +180,7 @@
             </label>
             <label>
               Số lượng
-              <input name="quantity" type="number" min="1" step="1" value="1" required />
+              <input name="quantity" type="number" min="1" max="100" step="1" value="1" required />
             </label>
             <div class="total-row">
               <span>Tổng tiền</span>
@@ -182,6 +193,7 @@
         </div>
       </section>
     </main>
+    <footer class="site-footer"><span>TRI THỨC CỔ</span><p>Đọc sớm một chút. Bớt trả giá một chút.</p><button class="ghost-buy js-buy" type="button">Đặt sách ngay</button></footer>
 
     <div class="mobile-buy-bar" id="mobile-buy-bar">
       <span data-current-price>199.000đ</span>
